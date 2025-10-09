@@ -196,8 +196,36 @@ namespace UsersService.Tests
 
             // Assert
             var conflictResult = Assert.IsType<ConflictObjectResult>(result);
-            conflictResult.StatusCode.Should().Be(409);
+            conflictResult.StatusCode.Should().Be(500);
             conflictResult.Value.Should().NotBeNull();
+            usersSvcMock.Verify(s => s.CreateUserAsync(It.Is<RegisterRequest>(r => r.Email == request.Email)), Times.Once);
+        }
+
+        [Fact]
+        public async Task Register_Should_Return_409Conflict_When_Email_Already_Exists()
+        {
+            // Arrange
+            var controller = BuildController(out var usersSvcMock, out _);
+            var request = new RegisterRequest
+            {
+                FirstName = "Test",
+                LastName = "User",
+                Email = "existing@example.com",
+                Password = "Password123!",
+                Role = "User",
+                BirthDate = new DateTime(1990, 1, 1)
+            };
+
+            usersSvcMock.Setup(s => s.CreateUserAsync(It.IsAny<RegisterRequest>()))
+                        .ThrowsAsync(new DuplicateEmailException(request.Email));
+
+            // Act
+            var result = await controller.Register(request);
+
+            // Assert
+            var conflict = Assert.IsType<ConflictObjectResult>(result);
+            conflict.StatusCode.Should().Be(409);
+            conflict.Value.Should().NotBeNull();
             usersSvcMock.Verify(s => s.CreateUserAsync(It.Is<RegisterRequest>(r => r.Email == request.Email)), Times.Once);
         }
     }
