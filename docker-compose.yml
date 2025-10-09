@@ -30,5 +30,12 @@ services:
     depends_on:
       - mongo-db
 
+  tests:
+    build:
+      context: .
+      dockerfile: tests/UsersService.Tests/Dockerfile
+    container_name: users-service-tests
+    profiles: ["ci", "test"]
+
 volumes:
   mongo-data: {}
