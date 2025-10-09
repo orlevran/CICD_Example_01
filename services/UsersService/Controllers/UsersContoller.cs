@@ -42,9 +42,13 @@ namespace UsersService.Controllers
             {
                 return BadRequest(new { Error = ex.Message });
             }
-            catch (Exception ex)
+            catch (DuplicateEmailException ex) // <-- add this specific conflict case
             {
                 return Conflict(new { Error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Error = "Unexpected error occurred", Details = ex.Message });
             }
         }
 
@@ -93,9 +97,9 @@ namespace UsersService.Controllers
                 var (user, jwt, expiresAt) = await AuthService.GenerateJwtToken(login.Id);
 
                 if (string.IsNullOrEmpty(jwt) || user == null)
-                    {
-                        return Unauthorized(new { Error = $"Could not generate JWT token. User found: {user != null}" });
-                    }
+                {
+                    return Unauthorized(new { Error = $"Could not generate JWT token. User found: {user != null}" });
+                }
 
                 user = await UsersService.UpdateUserAsync(user.Id, new EditUserRequest { LastLogin = DateTime.UtcNow, JwtToken = jwt });
                 return Ok(new LoginResponse { User = user, Token = jwt, ExpiresAt = expiresAt });
@@ -163,5 +167,11 @@ namespace UsersService.Controllers
                 return Conflict(ex.Message);
             }
         }
+    }
+    
+    public sealed class DuplicateEmailException : Exception
+    {
+        public DuplicateEmailException(string email)
+            : base($"A user with email '{email}' already exists.") { }
     }
 }
