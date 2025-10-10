@@ -42,7 +42,7 @@ namespace UsersService.Controllers
             {
                 return BadRequest(new { Error = ex.Message });
             }
-            catch (DuplicateEmailException ex) // <-- add this specific conflict case
+            catch (DuplicateEmailException ex)
             {
                 return Conflict(new { Error = ex.Message });
             }

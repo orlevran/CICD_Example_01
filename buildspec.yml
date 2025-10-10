@@ -1,0 +1,39 @@
+version: 0.2
+env:
+  variables:
+    IMAGE_REPO_NAME: "cicd-example-usersservice"
+    IMAGE_TAG: "latest"
+
+phases:
+  install:
+    runtime-versions:
+      dotnet: 9.0
+    commands:
+      - dotnet --info
+
+  pre_build:
+    commands:
+      - echo "Restore + TESTS"
+      - dotnet restore CICD_Example.sln
+      - dotnet test CICD_Example.sln --configuration Release --no-build --logger trx || exit 1
+      - echo "Login to ECR"
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION \
+        | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+
+  build:
+    commands:
+      - echo "Build Docker image"
+      - docker build -t ${IMAGE_REPO_NAME}:${IMAGE_TAG} ./services/UsersService
+      - docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:${IMAGE_TAG}
+
+  post_build:
+    commands:
+      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:${IMAGE_TAG}
+      - printf '{"ImageURI":"%s"}' "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:${IMAGE_TAG}" > imageDetail.json
+
+artifacts:
+  files:
+    - appspec.yml
+    - deploy/**/*
+    - docker-compose.prod.yml
+    - imageDetail.json

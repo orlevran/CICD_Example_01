@@ -1,0 +1,9 @@
+services:
+  users-service:
+    image: ${IMAGE_URI}    # injected at deploy time
+    container_name: users-service
+    ports:
+      - "80:8080"          # app listens on 8080 in container
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+    restart: unless-stopped
