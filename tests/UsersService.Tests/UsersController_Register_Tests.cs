@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using DnsClient.Protocol;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -223,7 +224,8 @@ namespace UsersService.Tests
             var result = await controller.Register(request);
 
             // Assert
-            var conflict = Assert.IsType<ConflictObjectResult>(result);
+            //var conflict = Assert.IsType<ConflictObjectResult>(result);
+            var conflict = Assert.IsType<Conflict>(result);
             conflict.StatusCode.Should().Be(409);
             conflict.Value.Should().NotBeNull();
             usersSvcMock.Verify(s => s.CreateUserAsync(It.Is<RegisterRequest>(r => r.Email == request.Email)), Times.Once);

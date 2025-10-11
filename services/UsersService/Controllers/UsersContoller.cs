@@ -43,7 +43,7 @@ namespace UsersService.Controllers
             }
             catch (DuplicateEmailException ex)
             {
-                return Conflict(new { Error = ex.Message }); // 409
+                return new ConflictObjectResult(new { Error = ex.Message }); // 409
             }
             catch (Exception ex)
             {
