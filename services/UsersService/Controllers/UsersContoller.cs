@@ -48,7 +48,7 @@ namespace UsersService.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Error = "Unexpected error occurred", Details = ex.Message });
+                return Conflict(new { Error = "Unexpected error occurred", Details = ex.Message });
             }
         }
 
