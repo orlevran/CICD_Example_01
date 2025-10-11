@@ -7,8 +7,12 @@ env:
 
 phases:
   install:
+    runtime-versions:
+      dotnet: 8.0
     commands:
       - dotnet --info
+      - echo "SDK in use:" && dotnet --version
+      - if [ -f global.json ]; then echo "global.json:" && cat global.json; fi
 
   pre_build:
     commands:
