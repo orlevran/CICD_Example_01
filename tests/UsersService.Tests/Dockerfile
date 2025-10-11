@@ -1,5 +1,5 @@
 # tests/UsersService.Tests/Dockerfile
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS testrunner
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS testrunner
 WORKDIR /src
 
 # copy solution & project files first (restore cache)
