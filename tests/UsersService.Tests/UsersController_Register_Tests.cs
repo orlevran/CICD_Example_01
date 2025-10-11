@@ -1,8 +1,5 @@
 using System;
-using System.Threading.Tasks;
-using DnsClient.Protocol;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -11,7 +8,6 @@ using UsersService.Controllers;
 using UsersService.Models;
 using UsersService.Models.DTOs;
 using UsersService.Services;
-using Xunit;
 
 namespace UsersService.Tests
 {
@@ -175,7 +171,7 @@ namespace UsersService.Tests
         }
 
         [Fact]
-        public async Task Register_Should_Return_409Conflict_On_Unexpected_Exception()
+        public async Task Register_Should_Return_500_On_Unexpected_Exception()
         {
             // Arrange
             var controller = BuildController(out var usersSvcMock, out _);
@@ -196,7 +192,7 @@ namespace UsersService.Tests
             var result = await controller.Register(request);
 
             // Assert
-            var conflictResult = Assert.IsType<ConflictObjectResult>(result);
+            var conflictResult = Assert.IsType<ObjectResult>(result);
             conflictResult.StatusCode.Should().Be(500);
             conflictResult.Value.Should().NotBeNull();
             usersSvcMock.Verify(s => s.CreateUserAsync(It.Is<RegisterRequest>(r => r.Email == request.Email)), Times.Once);
@@ -224,8 +220,7 @@ namespace UsersService.Tests
             var result = await controller.Register(request);
 
             // Assert
-            //var conflict = Assert.IsType<ConflictObjectResult>(result);
-            var conflict = Assert.IsType<Conflict>(result);
+            var conflict = Assert.IsType<ConflictObjectResult>(result);
             conflict.StatusCode.Should().Be(409);
             conflict.Value.Should().NotBeNull();
             usersSvcMock.Verify(s => s.CreateUserAsync(It.Is<RegisterRequest>(r => r.Email == request.Email)), Times.Once);
