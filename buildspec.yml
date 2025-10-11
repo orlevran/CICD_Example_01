@@ -7,8 +7,6 @@ env:
 
 phases:
   install:
-    runtime-versions:
-      dotnet: 9.0
     commands:
       - dotnet --info
 
