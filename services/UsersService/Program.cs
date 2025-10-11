@@ -57,11 +57,26 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
 });
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "UsersService", Version = "v1" });
+    // (Optional) Add JWT bearer UI support later if you want
+    // var securityScheme = new OpenApiSecurityScheme { ... };
+    // c.AddSecurityDefinition("Bearer", securityScheme);
+    // c.AddSecurityRequirement(new OpenApiSecurityRequirement { { securityScheme, Array.Empty<string>() }});
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "UsersService v1");
+        // c.RoutePrefix = ""; // uncomment to serve UI at "/"
+    });
 }
 app.UseHttpsRedirection();
 app.UseAuthentication();
