@@ -1,6 +1,7 @@
 using UsersService.Models;
 using UsersService.Models.DTOs;
 using UsersService.Repositories;
+using UsersService.Controllers;
 using MongoDB.Bson;
 
 namespace UsersService.Services
@@ -33,7 +34,7 @@ namespace UsersService.Services
                 var emailExists = await DatabaseStorage.GetUserByEmailAsync(request.Email);
                 if (emailExists != null)
                 {
-                    throw new Exception("Email already exists");
+                    throw new DuplicateEmailException("Email already exists");
                 }
 
                 if (string.IsNullOrEmpty(request.Password) || request.Password.Length < 6)

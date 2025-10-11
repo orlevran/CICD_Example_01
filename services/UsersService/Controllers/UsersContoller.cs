@@ -31,10 +31,9 @@ namespace UsersService.Controllers
             {
                 Console.WriteLine("Registering user: " + request.Email);
                 var user = await UsersService.CreateUserAsync(request);
+
                 if (user == null)
-                {
                     return BadRequest(new { Error = "User could not be created" });
-                }
 
                 return CreatedAtAction(nameof(Register), new { id = user.Id }, user);
             }
@@ -44,11 +43,11 @@ namespace UsersService.Controllers
             }
             catch (DuplicateEmailException ex)
             {
-                return Conflict(new { Error = ex.Message });
+                return Conflict(new { Error = ex.Message }); // 409
             }
             catch (Exception ex)
             {
-                return Conflict(new { Error = "Unexpected error occurred", Details = ex.Message });
+                return StatusCode(500, new { Error = "Unexpected error occurred", Details = ex.Message }); // 500
             }
         }
 
