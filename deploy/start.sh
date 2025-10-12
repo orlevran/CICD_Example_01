@@ -1,14 +1,29 @@
 #!/usr/bin/env bash
-set -euxo pipefail
+set -Eeuo pipefail
+
 cd /home/ubuntu/app
 
-# fallbacks if env vars not pre-set
-export AWS_REGION="${AWS_REGION:-eu-west-1}"
-export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-$AWS_REGION}"
+# --- Region defaults ---
+AWS_REGION="${AWS_REGION:-eu-west-1}"
+AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-$AWS_REGION}"
+export AWS_REGION AWS_DEFAULT_REGION
 
+# --- Resolve account id if not supplied ---
+AWS_ACCOUNT_ID="${AWS_ACCOUNT_ID:-$(aws sts get-caller-identity --query Account --output text)}"
+: "${AWS_ACCOUNT_ID:?Failed to resolve AWS_ACCOUNT_ID}"
+ECR_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+
+# --- Login to ECR (non-interactive) ---
 aws ecr get-login-password --region "$AWS_REGION" \
- | docker login --username AWS --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+  | sudo docker login --username AWS --password-stdin "$ECR_URI"
 
-docker compose -f docker-compose.rendered.yml pull
-docker compose -f docker-compose.rendered.yml up -d --remove-orphans
-docker ps
+# --- Deploy with Compose ---
+COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.rendered.yml}"
+if [[ ! -f "$COMPOSE_FILE" ]]; then
+  echo "Compose file '$COMPOSE_FILE' not found" >&2
+  exit 1
+fi
+
+sudo docker compose -f "$COMPOSE_FILE" pull
+sudo docker compose -f "$COMPOSE_FILE" up -d --remove-orphans
+sudo docker ps
