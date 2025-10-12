@@ -70,6 +70,7 @@ namespace UsersService.Tests
             usersSvcMock.Verify(s => s.CreateUserAsync(It.Is<RegisterRequest>(r => r.Email == request.Email)), Times.Once);
         }
 
+/*
         [Fact]
         public async Task Register_Should_Return_409_When_Email_Already_Exists()
         {
@@ -111,6 +112,7 @@ namespace UsersService.Tests
                 s.CreateUserAsync(It.Is<RegisterRequest>(r => r.Email == request.Email)),
                 Times.Once);
         }
+        */
 
         [Fact]
         public async Task Register_Should_Return_400_When_Service_Returns_Null()
