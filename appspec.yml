@@ -4,6 +4,14 @@ files:
   - source: /
     destination: /home/ubuntu/app
 hooks:
+  ApplicationStart:
+    - location: deploy/start.sh
+      timeout: 300
+      runas: ubuntu
+      env:
+        variables:
+          AWS_REGION: "eu-west-1"
+          AWS_ACCOUNT_ID: "797481488689"
   BeforeInstall:
     - location: deploy/clean.sh
       timeout: 300
