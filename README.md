@@ -130,7 +130,8 @@ Install Docker on EC2 instance:
 <br>sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 <br>sudo usermod -aG docker ubuntu
 </blockquote>
-----------------------------------------------------
+
+
 Validate on the EC2 instance:
 
 <blockquote>
@@ -139,7 +140,8 @@ Validate on the EC2 instance:
 <br>docker compose -f docker-compose.rendered.yml ps
 <br>docker logs <users-service-container-id> --tail=300
 </blockquote>
-----------------------------------------------------
+
+ 
 Register request:
 <blockquote>
 <br>POST http://<EC2_PUBLIC_IP>/users/register
@@ -154,7 +156,8 @@ Register request:
 <br>  "birthDate": "yyyy-mm-ddThh:mm:ssZ"
 <br>}
 </blockquote>
----------------------------------------------------
+
+
 Login Request:
 <blockquote>
 <br>POST http://<EC2_PUBLIC_IP>/users/login
@@ -165,7 +168,8 @@ Login Request:
   "password": "..." (original password)
 <br>}
 </blockquote>
---------------------------------------------------
+
+
 Edit Request:
 <blockquote>
 <br>PUT http://<EC2_PUBLIC_IP>/users/{user_id}
@@ -182,7 +186,8 @@ Edit Request:
 <br>  "role": "Guest", "User", or "Admin"
 <br>}
 <blockquote>
----------------------------------------------------
+
+ 
 Appendix – Quick reference (env vars). Set these in your compose or as EC2 environment variables:
 
 <br># JWT
