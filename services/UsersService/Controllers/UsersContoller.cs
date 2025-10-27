@@ -65,7 +65,8 @@ namespace UsersService.Controllers
                 var login = await UsersService.LoginUserAsync(request);
                 if (login == null)
                 {
-                    return Unauthorized(new { Error = $"Invalid email ({request.Email}) or password ({request.Password})" });
+                    return new UnauthorizedObjectResult(new { Error = $"Invalid email ({request.Email}) or password ({request.Password})" });
+                    //return Unauthorized(new { Error = $"Invalid email ({request.Email}) or password ({request.Password})" });
                 }
 
                 /*
